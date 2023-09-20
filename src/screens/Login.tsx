@@ -1,37 +1,70 @@
+import axios from "axios";
 import { useState } from "react"
-import { Button, StyleSheet, TextInput } from "react-native"
+import { Alert, Button, StyleSheet, TextInput } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
 const Login = ({navigation}: any) => {
-    const [text, setText] = useState<string>();
-    const [hasError, setHasError] = useState(false);
+    const [email, setEmail] = useState<string>();
+    const [password, setPassword] = useState<string>();
 
-    const passwordOnChangeInput = (value: string) => {
+    const onChangeEmailInput = (value: string) => {
         if(value.length < 3){
-            setHasError(true)
-        } else{
-            setHasError(false);
+            return;
         }
-        setText(value)
+        setEmail(value)
+    }
+    const onChangePasswordInput = (value: string) => {
+        if(value.length < 3){
+            return;
+        }
+        setPassword(value)
+    }
+    const login = () => {
+        axios({
+            method: 'post',
+            url: "https://tamagochiapi-clpsampedro.b4a.run/login",
+            data: {
+                email,
+                password
+            }
+        }).then( (response) => {
+            console.log(response)
+            if(response.status !== 200){
+            return Alert.alert(
+                'Error',
+                response.data.message,
+                [{
+                    onPress: () => navigation.navigate('Login')
+                }]
+            )
+            }
+            return navigation.navigate("Home");
+        })
     }
     return (
         <SafeAreaView style={style.inputView}>
             <TextInput
-                placeholder="Login"
+                value={email}
+                onChangeText={onChangeEmailInput}
+                placeholder="Email"
+                textContentType="emailAddress"
                 style={style.inputText}
             />
             <TextInput
-                value={text}
-                onChangeText={passwordOnChangeInput}
+                value={password}
+                onChangeText={onChangePasswordInput}
                 placeholder="Senha"
                 textContentType="password"
                 secureTextEntry
                 style={style.inputText}
             />
+            <Button onPress={login}
+                title="Login"
+            />
             <Button onPress={() => {
-                navigation.navigate("Home");
+                navigation.navigate("Register");
             }}
-            title="Login"
+                title="Criar uma conta"
             />
         </SafeAreaView>
     )
@@ -51,6 +84,9 @@ const style = StyleSheet.create({
         borderWidth: 1,
         borderColor: "#ffffff",
         borderRadius: 25
+    },
+    button: {
+        margin: 5
     }
 })
 export default Login;
