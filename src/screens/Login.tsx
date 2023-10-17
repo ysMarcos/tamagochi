@@ -2,57 +2,56 @@ import axios from "axios";
 import { useState } from "react"
 import { Alert, Button, StyleSheet, TextInput } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
+import userStore from "../userStore";
+
 
 const Login = ({navigation}: any) => {
-    const [email, setEmail] = useState<string>();
-    const [password, setPassword] = useState<string>();
+    const [email, setEmail] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
+    const store = userStore();
 
-    const onChangeEmailInput = (value: string) => {
-        if(value.length < 3){
-            return;
-        }
-        setEmail(value)
-    }
-    const onChangePasswordInput = (value: string) => {
-        if(value.length < 3){
-            return;
-        }
-        setPassword(value)
-    }
-    const login = () => {
-        axios({
-            method: 'post',
-            url: "https://tamagochiapi-clpsampedro.b4a.run/login",
-            data: {
+    const login = async () => {
+        console.log(email)
+        console.log(password)
+        try{
+            const response = await axios.post( "https://tamagochiapi-clpsampedro.b4a.run/login",
+            {
                 email,
                 password
             }
-        }).then( (response) => {
-            console.log(response)
-            if(response.status !== 200){
-            return Alert.alert(
+        );
+        if(response.status !== 200) {
+            Alert.alert(
                 'Error',
-                response.data.message,
+                "Email ou Senha Inválidos",
                 [{
                     onPress: () => navigation.navigate('Login')
                 }]
             )
-            }
-            return navigation.navigate("Home");
-        })
+        }
+        if(response.status === 200) {
+            const token = response.data.token;
+            store.setToken(token);
+            navigation.navigate("Home");
+        }
+
+        } catch (error) {
+            console.log(error)
+        }
+
     }
     return (
         <SafeAreaView style={style.inputView}>
             <TextInput
                 value={email}
-                onChangeText={onChangeEmailInput}
+                onChangeText={text => setEmail(text)}
                 placeholder="Email"
                 textContentType="emailAddress"
                 style={style.inputText}
             />
             <TextInput
                 value={password}
-                onChangeText={onChangePasswordInput}
+                onChangeText={text => setPassword(text)}
                 placeholder="Senha"
                 textContentType="password"
                 secureTextEntry

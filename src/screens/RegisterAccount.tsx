@@ -4,95 +4,83 @@ import { SafeAreaView } from "react-native-safe-area-context"
 import axios from "axios"
 
 const Register = ({navigation}: any) => {
-    const [email, setEmail] = useState<string>();
-    const [password, setPassword] = useState<string>();
-    const [passwordConfirmation, setPasswordConfirmation] = useState<string>();
+    const [email, setEmail] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
+    const [passwordConfirmation, setPasswordConfirmation] = useState<string>('');
 
-    const onChangeEmailInput = (value: string) => {
-        if(value.length < 3){
-            return Alert.alert(
-                'Error',
-                "Preencha o email",
-                [{
-                    onPress: () => navigation.navigate('Register')
-                }]
-            )
-        }
-        setEmail(value)
-    }
-    const onChangePasswordInput = (value: string) => {
-        if(value.length < 3){
-            return Alert.alert(
-                'Error',
-                "Preencha a senha",
-                [{
-                    onPress: () => navigation.navigate('Register')
-                }]
-            )
-        }
-        setPassword(value)
-    }
-    const onChangePasswordConfirmationInput = (value: string) => {
-        if(value.length < 3){
-            return Alert.alert(
-                'Error',
-                "Preencha a confirmação de senha",
-                [{
-                    onPress: () => navigation.navigate('Register')
-                }]
-            )
-        }
-        setPasswordConfirmation(value);
-    }
-    const register = () => {
+    const handleEmail = (text: string) => {
+        setEmail(text)
+    };
 
-        axios({
-            method: 'post',
-            url: "https://tamagochiapi-clpsampedro.b4a.run/register",
-            data: {
+    const register = async () => {
+
+        if(password !== passwordConfirmation){
+            return Alert.alert(
+                'Error',
+                "As senhas devem ser iguais",
+                [{
+                    onPress: () => navigation.navigate('Register')
+                }]
+            )
+        }
+        if(email.length < 5){
+            return Alert.alert(
+                'Error',
+                "O Email deve ter mais de 5 caracteres",
+                [{
+                    onPress: () => navigation.navigate('Register')
+                }]
+            )
+        }
+        if(password.length < 5){
+            return Alert.alert(
+                'Error',
+                "A senhas deve ter mais de 5 caracteres",
+                [{
+                    onPress: () => navigation.navigate('Register')
+                }]
+            )
+        }
+        if(password !== passwordConfirmation){
+            return Alert.alert(
+                'Error',
+                "As senhas devem ser iguais",
+                [{
+                    onPress: () => navigation.navigate('Register')
+                }]
+            )
+        }
+        try {
+            const response = await axios.post("https://tamagochiapi-clpsampedro.b4a.run/register", {
                 email,
                 password
-            }
-        }).then( (response) => {
-            if(password !== passwordConfirmation){
-                return Alert.alert(
-                    'Error',
-                    "As senhas devem ser iguais",
+            });
+            if( response.status === 200){
+                Alert.alert(
+                    "Sucesso",
+                    "Sua Conta Criada com Sucesso",
                     [{
-                        onPress: () => navigation.navigate('Register')
+                        onPress: () => navigation.navigate("Login")
                     }]
                 )
             }
-            if(response.status !== 200){
-            return Alert.alert(
-                'Error',
-                response.data.message,
-                [{
-                    onPress: () => navigation.navigate('Register')
-                }]
-            )
-            }
-            Alert.alert(
-                "Sucesso!",
-                "Conta criada com sucesso",
-                [{
-                    onPress:()=>navigation.navigate("Login")
-                }])
-        })
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     return (
         <SafeAreaView style={style.inputView}>
             <TextInput
+                onChangeText={text => setEmail(text)}
                 value={email}
-                //onChangeText={onChangeEmailInput}
                 placeholder="Email"
                 id="email"
                 style={style.inputText}
             />
             <TextInput
                 value={password}
-                //onChangeText={onChangePasswordInput}
+                onChangeText={text => setPassword(text)}
                 placeholder="Senha"
                 textContentType="password"
                 secureTextEntry
@@ -100,7 +88,7 @@ const Register = ({navigation}: any) => {
             />
             <TextInput
                 value={passwordConfirmation}
-                //onChangeText={onChangePasswordConfirmationInput}
+                onChangeText={text => setPasswordConfirmation(text)}
                 placeholder="Confirmação de Senha"
                 textContentType="password"
                 secureTextEntry
