@@ -6,6 +6,9 @@ import Login from './src/screens/Login';
 import Register from './src/screens/RegisterAccount';
 import CreatePet from './src/screens/CreatePet';
 import { PaperProvider } from 'react-native-paper';
+import Game from './src/screens/Game';
+import UpdatePet from './src/screens/UpdatePet';
+import GetPet from './src/screens/GetPet';
 
 const Stack = createNativeStackNavigator();
 
@@ -18,6 +21,9 @@ function App(): JSX.Element {
         <Stack.Screen name="Register" component={Register} />
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="CreatePet" component={CreatePet} />
+        <Stack.Screen name="UpdatePet" component={UpdatePet} />
+        <Stack.Screen name="GetPet" component={GetPet} />
+        <Stack.Screen name="Game" component={Game} />
     </Stack.Navigator>
   </NavigationContainer>
 </PaperProvider>
